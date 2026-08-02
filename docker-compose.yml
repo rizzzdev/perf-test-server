@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  node-api:
+    build: ./node
+    container_name: node-health-api
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apps-node.rule=Host(`api-node.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.apps-node.entrypoints=websecure"
+      - "traefik.http.routers.apps-node.tls.certresolver=myresolver"
+      - "traefik.http.services.apps-node.loadbalancer.server.port=3000"
+
+  go-api:
+    build: ./go
+    container_name: go-health-api
+    restart: unless-stopped
+    environment:
+      - PORT=8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.apps-go.rule=Host(`api-go.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.apps-go.entrypoints=websecure"
+      - "traefik.http.routers.apps-go.tls.certresolver=myresolver"
+      - "traefik.http.services.apps-go.loadbalancer.server.port=8080"
